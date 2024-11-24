@@ -1,18 +1,17 @@
 use crossterm::style::{Color, Stylize};
 
 fn main() {
-    let size = 7;
     let sha1 = "5a98d8";
-    fill(size, sha1);
+    fill(sha1, "Unknown");
 }
 
-fn fill(num: usize, sha: &str) {
+fn fill(sha: &str, name: &str) {
+    let num = 7;
     let col = sha2col(sha);
-    let fill = " ".repeat(num);
-    println!("{}", fill.clone().on(col));
-    print!("{}", fill.clone().on(col));
-    println!(" Your commit colour is {}", "unknown");
-    println!("{}", fill.clone().on(col));
+    let block = " ".repeat(num).on(col);
+    println!("{}", block);
+    println!("{} Your commit colour is {}", block, name);
+    println!("{}", block);
     println!("#{}", sha);
 }
 
