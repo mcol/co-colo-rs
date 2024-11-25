@@ -1,4 +1,5 @@
 use crossterm::style::{Color, Stylize};
+use std::env;
 use std::fs;
 
 struct Col {
@@ -26,7 +27,12 @@ impl Col {
 }
 
 fn main() {
-    let sha1 = "5a98d8";
+    let args: Vec<String> = env::args().collect();
+    if args.len() == 1 {
+        println!("Usage: co-colo-rs <sha1>");
+        return;
+    }
+    let sha1 = &args[1][0..6];
     let file = "all-colors.csv";
     let file = fs::read_to_string(file).expect("Error reading file");
     let mut names: Vec<String> = Vec::new();
