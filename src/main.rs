@@ -1,6 +1,5 @@
 use crossterm::style::{Color, Stylize};
 use std::env;
-use std::fs;
 
 struct Col {
     r: i32,
@@ -33,8 +32,7 @@ fn main() {
         return;
     }
     let sha1 = &args[1][0..6];
-    let file = "all-colors.csv";
-    let file = fs::read_to_string(file).expect("Error reading file");
+    let file = include_str!("../all-colors.csv");
     let mut names: Vec<String> = Vec::new();
     let mut rgbs: Vec<Col> = Vec::new();
     for line in file.lines() {
