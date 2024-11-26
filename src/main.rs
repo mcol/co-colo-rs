@@ -48,10 +48,10 @@ fn main() {
 fn fill(sha: &str, color: &Col, name: &str) {
     let num = 7;
     let block = " ".repeat(num).on(color.rgb());
-    println!("{}", block);
+    println!("\n{}", block);
     println!("{} Your commit colour is {}", block, name);
     println!("{}", block);
-    println!("#{}", sha);
+    println!("#{}\n", sha);
 }
 
 fn closest(rgb: &Col, rgbs: &[Col]) -> usize {
