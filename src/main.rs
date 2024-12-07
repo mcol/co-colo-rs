@@ -49,11 +49,18 @@ impl Col {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.len() == 1 {
-        println!("Usage: co-colo-rs <sha1>");
+    let argc = args.len();
+    let usage = "Usage: co-colo-rs [--oneline] <sha1>";
+    if argc == 1 || argc > 3 {
+        println!("{usage}");
         return;
     }
-    let sha1 = &args[1][0..6];
+    if argc == 3 && &args[1] != "--oneline" {
+        println!("Unrecognised option '{}'", &args[1]);
+        println!("{usage}");
+        return;
+    }
+    let sha1 = &args[argc - 1][0..6];
     let file = include_str!("../all-colors.csv");
     let mut names: Vec<String> = Vec::new();
     let mut rgbs: Vec<Col> = Vec::new();
@@ -64,16 +71,21 @@ fn main() {
         rgbs.push(Col::new(code));
     }
     let idx_closest = closest(&Col::new(sha1), &rgbs);
-    fill(sha1, &rgbs[idx_closest], &names[idx_closest]);
+    fill(sha1, &rgbs[idx_closest], &names[idx_closest], argc == 3);
 }
 
-fn fill(sha: &str, color: &Col, name: &str) {
+fn fill(sha: &str, color: &Col, name: &str, oneline: bool) {
     let num = 7;
     let block = " ".repeat(num).on(color.rgb());
-    println!("\n{}", block);
-    println!("{} Your commit colour is {}", block, name);
-    println!("{}", block);
-    println!("#{}\n", sha);
+    let msg = "Your commit colour is";
+    if oneline {
+        println!("{} {} {} (#{})", block, msg, name, sha);
+    } else {
+        println!("\n{}", block);
+        println!("{} {} {}", block, msg, name);
+        println!("{}", block);
+        println!("#{}\n", sha);
+    }
 }
 
 fn closest(rgb: &Col, rgbs: &[Col]) -> usize {
