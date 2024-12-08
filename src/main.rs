@@ -30,14 +30,6 @@ struct Col {
 }
 
 impl Col {
-    fn new(sha: &str) -> Self {
-        Self {
-            r: i32::from_str_radix(&sha[0..2], 16).unwrap(),
-            g: i32::from_str_radix(&sha[2..4], 16).unwrap(),
-            b: i32::from_str_radix(&sha[4..6], 16).unwrap(),
-        }
-    }
-
     fn rgb(&self) -> Color {
         Color::Rgb {
             r: self.r as u8,
@@ -45,6 +37,13 @@ impl Col {
             b: self.b as u8,
         }
     }
+}
+
+fn parse_sha(sha: &str) -> Option<(i32, i32, i32)> {
+    let r = i32::from_str_radix(&sha[0..2], 16).ok()?;
+    let g = i32::from_str_radix(&sha[2..4], 16).ok()?;
+    let b = i32::from_str_radix(&sha[4..6], 16).ok()?;
+    Some((r, g, b))
 }
 
 fn main() {
@@ -68,10 +67,16 @@ fn main() {
         let code = &line[0..6];
         let name = &line[7..];
         names.push(name.to_string());
-        rgbs.push(Col::new(code));
+        if let Some((r, g, b)) = parse_sha(code) {
+            rgbs.push(Col { r, g, b });
+        }
     }
-    let idx_closest = closest(&Col::new(sha1), &rgbs);
-    fill(sha1, &rgbs[idx_closest], &names[idx_closest], argc == 3);
+    if let Some((r, g, b)) = parse_sha(sha1) {
+        let idx_closest = closest(&Col { r, g, b }, &rgbs);
+        fill(sha1, &rgbs[idx_closest], &names[idx_closest], argc == 3);
+    } else {
+        println!("{sha1} is not a valid sha1")
+    }
 }
 
 fn fill(sha: &str, color: &Col, name: &str, oneline: bool) {
