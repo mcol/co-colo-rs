@@ -2,6 +2,8 @@
 
 A clone of [commit-colors](https://github.com/sparkbox/commit-colors) written in Rust.
 
+![animated gif demonstrating co-colo-rs](https://raw.githubusercontent.com/mcol/co-colo-rs/master/demo.gif)
+
 # Adding co-colo-rs to a specific repository
 
 Create a file named `post-commit` inside the `.git/hooks` of your
