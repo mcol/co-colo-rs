@@ -59,7 +59,11 @@ fn main() {
         println!("{usage}");
         return;
     }
-    let sha1 = &args[argc - 1][0..6];
+    let sha1 = &args[argc - 1];
+    if sha1.len() < 6 {
+        println!("{sha1} is not a valid sha1");
+        return;
+    }
     let file = include_str!("../all-colors.csv");
     let mut names: Vec<String> = Vec::new();
     let mut rgbs: Vec<Col> = Vec::new();
@@ -71,7 +75,7 @@ fn main() {
             rgbs.push(Col { r, g, b });
         }
     }
-    if let Some((r, g, b)) = parse_sha(sha1) {
+    if let Some((r, g, b)) = parse_sha(&sha1[0..6]) {
         let idx_closest = closest(&Col { r, g, b }, &rgbs);
         fill(sha1, &rgbs[idx_closest], &names[idx_closest], argc == 3);
     } else {
