@@ -40,6 +40,9 @@ impl Col {
 }
 
 fn parse_sha(sha: &str) -> Option<(i32, i32, i32)> {
+    if sha.len() < 6 {
+        return None;
+    }
     let r = i32::from_str_radix(&sha[0..2], 16).ok()?;
     let g = i32::from_str_radix(&sha[2..4], 16).ok()?;
     let b = i32::from_str_radix(&sha[4..6], 16).ok()?;
@@ -60,10 +63,6 @@ fn main() {
         return;
     }
     let sha1 = &args[argc - 1];
-    if sha1.len() < 6 {
-        println!("{sha1} is not a valid sha1");
-        return;
-    }
     let file = include_str!("../all-colors.csv");
     let mut names: Vec<String> = Vec::new();
     let mut rgbs: Vec<Col> = Vec::new();
@@ -75,7 +74,7 @@ fn main() {
             rgbs.push(Col { r, g, b });
         }
     }
-    if let Some((r, g, b)) = parse_sha(&sha1[0..6]) {
+    if let Some((r, g, b)) = parse_sha(sha1) {
         let idx_closest = closest(&Col { r, g, b }, &rgbs);
         fill(sha1, &rgbs[idx_closest], &names[idx_closest], argc == 3);
     } else {
