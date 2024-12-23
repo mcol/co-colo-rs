@@ -40,12 +40,9 @@ impl Col {
 }
 
 fn parse_sha(sha: &str) -> Option<(i32, i32, i32)> {
-    if sha.len() < 6 {
-        return None;
-    }
-    let r = i32::from_str_radix(&sha[0..2], 16).ok()?;
-    let g = i32::from_str_radix(&sha[2..4], 16).ok()?;
-    let b = i32::from_str_radix(&sha[4..6], 16).ok()?;
+    let r = i32::from_str_radix(sha.get(0..2)?, 16).ok()?;
+    let g = i32::from_str_radix(sha.get(2..4)?, 16).ok()?;
+    let b = i32::from_str_radix(sha.get(4..6)?, 16).ok()?;
     Some((r, g, b))
 }
 
