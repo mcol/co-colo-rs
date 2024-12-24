@@ -109,3 +109,33 @@ fn closest(rgb: &Col, rgbs: &[Col]) -> usize {
 fn distance(c1: &Col, c2: &Col) -> f32 {
     f32::sqrt(((c1.r - c2.r).pow(2) + (c1.g - c2.g).pow(2) + (c1.b - c2.b).pow(2)) as f32)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_valid_parse_sha1() {
+        assert_eq!(parse_sha(&"123123123123"), Some((18, 49, 35)));
+        assert_eq!(parse_sha(&"123123"), Some((18, 49, 35)));
+        assert_eq!(parse_sha(&"000000"), Some((0, 0, 0)));
+    }
+
+    #[test]
+    fn test_invalid_parse_sha1() {
+        assert_eq!(parse_sha(&"123"), None);
+        assert_eq!(parse_sha(&"123ijk"), None);
+    }
+
+    #[test]
+    fn test_distance() {
+        let col1 = Col { r: 0, g: 0, b: 0 };
+        let col2 = Col {
+            r: 255,
+            g: 255,
+            b: 255,
+        };
+        assert_eq!(distance(&col1, &col1), 0f32);
+        assert_eq!(distance(&col1, &col2), 441.67294f32);
+    }
+}
