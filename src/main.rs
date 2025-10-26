@@ -1,6 +1,6 @@
 // ==========================================================================
 //
-//  Copyright (c) 2024 Marco Colombo
+//  Copyright (c) 2024, 2025 Marco Colombo
 //
 //  Inspired by commit-colours by Bryan Braun:
 //     https://github.com/sparkbox/commit-colors
@@ -64,8 +64,7 @@ fn main() {
     let mut names: Vec<String> = Vec::new();
     let mut rgbs: Vec<Col> = Vec::new();
     for line in file.lines() {
-        let code = &line[0..6];
-        let name = &line[7..];
+        let (code, name) = line.split_at(7);
         names.push(name.to_string());
         if let Some((r, g, b)) = parse_sha(code) {
             rgbs.push(Col { r, g, b });
@@ -86,24 +85,22 @@ fn fill(sha: &str, color: &Col, name: &str, oneline: bool) {
     if oneline {
         println!("{} {} {} (#{})", block, msg, name, sha);
     } else {
-        println!("\n{}", block);
-        println!("{} {} {}", block, msg, name);
-        println!("{}", block);
-        println!("#{}\n", sha);
-    }
+        println!(
+            "\n{}\n{} {} {}\n{}\n#{}\n",
+            block, block, msg, name, block, sha
+        )
+    };
 }
 
 fn closest(rgb: &Col, rgbs: &[Col]) -> usize {
-    let mut max = f32::MAX;
-    let mut idx = 0;
-    for (i, item) in rgbs.iter().enumerate() {
+    let mut idx_dist = (0, f32::MAX);
+    for (idx, item) in rgbs.iter().enumerate() {
         let dist = distance(rgb, item);
-        if dist < max {
-            max = dist;
-            idx = i;
+        if dist < idx_dist.1 {
+            idx_dist = (idx, dist);
         }
     }
-    idx
+    idx_dist.0
 }
 
 fn distance(c1: &Col, c2: &Col) -> f32 {
