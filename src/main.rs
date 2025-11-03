@@ -60,16 +60,13 @@ fn main() {
         return;
     }
     let sha1 = &args[argc - 1];
-    let file = include_str!("../all-colors.csv");
-    let mut names: Vec<String> = Vec::new();
-    let mut rgbs: Vec<Col> = Vec::new();
-    for line in file.lines() {
-        let (code, name) = line.split_at(7);
-        names.push(name.to_string());
-        if let Some((r, g, b)) = parse_sha(code) {
-            rgbs.push(Col { r, g, b });
-        }
-    }
+    let (rgbs, names): (Vec<_>, Vec<_>) = include_str!("../all-colors.csv")
+        .lines()
+        .filter_map(|line| {
+            let (code, name) = line.split_at(7);
+            parse_sha(code).map(|(r, g, b)| (Col { r, g, b }, name.to_string()))
+        })
+        .unzip();
     if let Some((r, g, b)) = parse_sha(sha1) {
         let idx_closest = closest(&Col { r, g, b }, &rgbs);
         fill(sha1, &rgbs[idx_closest], &names[idx_closest], argc == 3);
@@ -93,14 +90,12 @@ fn fill(sha: &str, color: &Col, name: &str, oneline: bool) {
 }
 
 fn closest(rgb: &Col, rgbs: &[Col]) -> usize {
-    let mut idx_dist = (0, f32::MAX);
-    for (idx, item) in rgbs.iter().enumerate() {
-        let dist = distance(rgb, item);
-        if dist < idx_dist.1 {
-            idx_dist = (idx, dist);
-        }
-    }
-    idx_dist.0
+    rgbs.iter()
+        .enumerate()
+        .map(|(idx, item)| (idx, distance(rgb, item)))
+        .min_by(|(_, dist_a), (_, dist_b)| dist_a.partial_cmp(dist_b).unwrap())
+        .map(|(idx, _)| idx)
+        .unwrap()
 }
 
 fn distance(c1: &Col, c2: &Col) -> f32 {
